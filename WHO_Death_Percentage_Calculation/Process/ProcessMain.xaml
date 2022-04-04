@@ -1,16 +1,13 @@
-<Activity mc:Ignorable="sap sap2010" x:Class="ProcessMain" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib" xmlns:sd="clr-namespace:System.Data;assembly=System.Data" xmlns:this="clr-namespace:" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
+<Activity mc:Ignorable="sap sap2010" x:Class="ProcessMain" xmlns="http://schemas.microsoft.com/netfx/2009/xaml/activities" xmlns:euheo="clr-namespace:Element5_Core.Utils.Hooks.Execution_Hooks.Optimization;assembly=Element5.Core" xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" xmlns:mva="clr-namespace:Microsoft.VisualBasic.Activities;assembly=System.Activities" xmlns:sap="http://schemas.microsoft.com/netfx/2009/xaml/activities/presentation" xmlns:sap2010="http://schemas.microsoft.com/netfx/2010/xaml/activities/presentation" xmlns:scg="clr-namespace:System.Collections.Generic;assembly=mscorlib" xmlns:sd="clr-namespace:System.Data;assembly=System.Data" xmlns:ui="http://schemas.uipath.com/workflow/activities" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml">
   <x:Members>
     <x:Property Name="in_out_configData" Type="InOutArgument(scg:Dictionary(x:String, x:String))" />
     <x:Property Name="in_out_errorCode" Type="InOutArgument(scg:Dictionary(x:String, x:String))" />
-    <x:Property Name="out_htmlDeathTable" Type="InArgument(x:String)" />
+    <x:Property sap2010:Annotation.AnnotationText="It holds the value of final report table data " Name="out_htmlDeathTable" Type="OutArgument(x:String)" />
   </x:Members>
-  <this:ProcessMain.out_htmlDeathTable>
-    <InArgument x:TypeArguments="x:String" />
-  </this:ProcessMain.out_htmlDeathTable>
   <mva:VisualBasic.Settings>
     <x:Null />
   </mva:VisualBasic.Settings>
-  <sap:VirtualizedContainerService.HintSize>823.2,993.6</sap:VirtualizedContainerService.HintSize>
+  <sap:VirtualizedContainerService.HintSize>824,1166</sap:VirtualizedContainerService.HintSize>
   <sap2010:WorkflowViewState.IdRef>ProcessMain_1</sap2010:WorkflowViewState.IdRef>
   <TextExpression.NamespacesForImplementation>
     <scg:List x:TypeArguments="x:String" Capacity="54">
@@ -42,10 +39,20 @@
       <x:String>System.ComponentModel</x:String>
       <x:String>System.Xml.Serialization</x:String>
       <x:String>System.Activities.DynamicUpdate</x:String>
+      <x:String>System.Security</x:String>
+      <x:String>Newtonsoft.Json.Linq</x:String>
+      <x:String>Newtonsoft.Json</x:String>
+      <x:String>System.Dynamic</x:String>
+      <x:String>System.Collections.Specialized</x:String>
+      <x:String>Element5_Core.Utils.Hooks.Execution_Hooks.Optimization</x:String>
+      <x:String>System.Net</x:String>
+      <x:String>Microsoft.VisualBasic.CompilerServices</x:String>
+      <x:String>UiPath.Web</x:String>
+      <x:String>UiPath.Web.Activities</x:String>
     </scg:List>
   </TextExpression.NamespacesForImplementation>
   <TextExpression.ReferencesForImplementation>
-    <scg:List x:TypeArguments="AssemblyReference" Capacity="26">
+    <scg:List x:TypeArguments="AssemblyReference" Capacity="52">
       <AssemblyReference>System.Activities</AssemblyReference>
       <AssemblyReference>Microsoft.VisualBasic</AssemblyReference>
       <AssemblyReference>mscorlib</AssemblyReference>
@@ -71,13 +78,17 @@
       <AssemblyReference>System.ValueTuple</AssemblyReference>
       <AssemblyReference>System.ComponentModel.Composition</AssemblyReference>
       <AssemblyReference>UiPath.Excel</AssemblyReference>
+      <AssemblyReference>Newtonsoft.Json</AssemblyReference>
+      <AssemblyReference>Element5.Core</AssemblyReference>
+      <AssemblyReference>UiPath.Web</AssemblyReference>
+      <AssemblyReference>UiPath.Web.Activities</AssemblyReference>
     </scg:List>
   </TextExpression.ReferencesForImplementation>
-  <Sequence sap2010:Annotation.AnnotationText="" DisplayName="ProcessMain" sap:VirtualizedContainerService.HintSize="420,928.8" sap2010:WorkflowViewState.IdRef="Sequence_1">
+  <Sequence sap2010:Annotation.AnnotationText="1. WHO webpage process&#xA;2. Worldometer webpage process&#xA;3. Merging the both new deaths and total death table&#xA;4. Calculating the percentage of new cases and deaths&#xA;5. Generating the final report" DisplayName="ProcessMain" sap:VirtualizedContainerService.HintSize="421,961" sap2010:WorkflowViewState.IdRef="Sequence_1">
     <Sequence.Variables>
-      <Variable x:TypeArguments="sd:DataTable" Name="dt_newDeathsData" />
-      <Variable x:TypeArguments="sd:DataTable" Name="dt_totalDeathsData" />
-      <Variable x:TypeArguments="sd:DataTable" Name="dt_deaths" />
+      <Variable x:TypeArguments="sd:DataTable" sap2010:Annotation.AnnotationText="output data table from WHO process" Name="dt_newDeathsData" />
+      <Variable x:TypeArguments="sd:DataTable" sap2010:Annotation.AnnotationText="Output data table from Worldometer " Name="dt_totalDeathsData" />
+      <Variable x:TypeArguments="sd:DataTable" sap2010:Annotation.AnnotationText="Merge data table from WHO and Worldometer" Name="dt_deaths" />
     </Sequence.Variables>
     <sap:WorkflowViewStateService.ViewState>
       <scg:Dictionary x:TypeArguments="x:String, x:Object">
@@ -85,32 +96,33 @@
         <x:Boolean x:Key="IsAnnotationDocked">True</x:Boolean>
       </scg:Dictionary>
     </sap:WorkflowViewStateService.ViewState>
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WHOMain workflow" sap:VirtualizedContainerService.HintSize="378.4,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Process\WHO\WHOMain.xaml">
+    <euheo:Begin_Task_Execution ClientName="{x:Null}" DeepLink="{x:Null}" ExecutionType="{x:Null}" FlowConfig="{x:Null}" HookPassword="{x:Null}" HookURL="{x:Null}" HookUserName="{x:Null}" ProcessIdentifier="{x:Null}" ProcessName="{x:Null}" SummaryFieldNames="{x:Null}" TaskName="{x:Null}" TaskRunIdentifier="{x:Null}" TaskRunJson_OutValue="{x:Null}" DisplayName="Begin Task Execution" sap:VirtualizedContainerService.HintSize="379,22" sap2010:WorkflowViewState.IdRef="Begin_Task_Execution_1" __Prefix="[IO.Directory.GetCurrentDirectory]" />
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WHOMain workflow" sap:VirtualizedContainerService.HintSize="379,112" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_1" UnSafe="False" WorkflowFileName="Process\WHO\WHOMain.xaml">
       <ui:InvokeWorkflowFile.Arguments>
         <InOutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="in_out_configData">[in_out_configData]</InOutArgument>
         <OutArgument x:TypeArguments="sd:DataTable" x:Key="out_dt_newDeathsData">[dt_newDeathsData]</OutArgument>
       </ui:InvokeWorkflowFile.Arguments>
     </ui:InvokeWorkflowFile>
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WorldometerMain workflow" sap:VirtualizedContainerService.HintSize="378.4,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_2" UnSafe="False" WorkflowFileName="Process\Worldometer\WorldometerMain.xaml">
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke WorldometerMain workflow" sap:VirtualizedContainerService.HintSize="379,112" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_2" UnSafe="False" WorkflowFileName="Process\Worldometer\WorldometerMain.xaml">
       <ui:InvokeWorkflowFile.Arguments>
         <InOutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="in_out_configData">[in_out_configData]</InOutArgument>
         <OutArgument x:TypeArguments="sd:DataTable" x:Key="out_dt_totalDeathsData">[dt_totalDeathsData]</OutArgument>
         <InOutArgument x:TypeArguments="scg:Dictionary(x:String, x:String)" x:Key="in_out_errorCode">[in_out_errorCode]</InOutArgument>
       </ui:InvokeWorkflowFile.Arguments>
     </ui:InvokeWorkflowFile>
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke CompareNewDeathsTableAndTotalDeathsTable workflow" sap:VirtualizedContainerService.HintSize="378.4,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_3" UnSafe="False" WorkflowFileName="Process\CompareNewDeathsTableAndTotalDeathsTable.xaml">
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke CompareNewDeathsTableAndTotalDeathsTable workflow" sap:VirtualizedContainerService.HintSize="379,112" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_3" UnSafe="False" WorkflowFileName="Process\CompareNewDeathsTableAndTotalDeathsTable.xaml">
       <ui:InvokeWorkflowFile.Arguments>
         <InArgument x:TypeArguments="sd:DataTable" x:Key="in_dt_totalDeathsData">[dt_totalDeathsData]</InArgument>
         <InArgument x:TypeArguments="sd:DataTable" x:Key="in_dt_newDeathsData">[dt_newDeathsData]</InArgument>
         <OutArgument x:TypeArguments="sd:DataTable" x:Key="out_dt_deaths">[dt_deaths]</OutArgument>
       </ui:InvokeWorkflowFile.Arguments>
     </ui:InvokeWorkflowFile>
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke CalculateDeathsPercentage workflow" sap:VirtualizedContainerService.HintSize="378.4,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_4" UnSafe="False" WorkflowFileName="Process\CalculateDeathsPercentage.xaml">
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke CalculateDeathsPercentage workflow" sap:VirtualizedContainerService.HintSize="379,112" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_4" UnSafe="False" WorkflowFileName="Process\CalculateDeathsPercentage.xaml">
       <ui:InvokeWorkflowFile.Arguments>
         <InOutArgument x:TypeArguments="sd:DataTable" x:Key="in_out_dt_deaths">[dt_deaths]</InOutArgument>
       </ui:InvokeWorkflowFile.Arguments>
     </ui:InvokeWorkflowFile>
-    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke GenerateReport workflow" sap:VirtualizedContainerService.HintSize="378.4,113.6" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_5" UnSafe="False" WorkflowFileName="Process\GenerateReport.xaml">
+    <ui:InvokeWorkflowFile ArgumentsVariable="{x:Null}" ContinueOnError="{x:Null}" DisplayName="Invoke GenerateReport workflow" sap:VirtualizedContainerService.HintSize="379,112" sap2010:WorkflowViewState.IdRef="InvokeWorkflowFile_5" UnSafe="False" WorkflowFileName="Process\GenerateReport.xaml">
       <ui:InvokeWorkflowFile.Arguments>
         <InArgument x:TypeArguments="sd:DataTable" x:Key="in_dt_deaths">[dt_deaths]</InArgument>
         <OutArgument x:TypeArguments="x:String" x:Key="out_htmlDeathTable">[out_htmlDeathTable]</OutArgument>
